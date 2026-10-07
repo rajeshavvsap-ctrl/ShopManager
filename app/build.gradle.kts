@@ -10,7 +10,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.shopmanager.app"
+        applicationId = "com.shopactivitys.app"
         minSdk = 26
         targetSdk = 36
         // Each GitHub build gets a higher version code (Play Store needs this for every update)
