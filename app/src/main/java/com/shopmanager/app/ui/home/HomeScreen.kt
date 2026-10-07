@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.PointOfSale
@@ -36,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.shopmanager.app.Routes
 import com.shopmanager.app.data.DaySummary
 import com.shopmanager.app.data.ShopRepository
+import com.shopmanager.app.reports.Period
+import com.shopmanager.app.reports.PeriodType
 import com.shopmanager.app.shopApp
 import com.shopmanager.app.ui.components.AppScaffold
 import com.shopmanager.app.ui.theme.Danger
@@ -56,6 +59,8 @@ fun HomeScreen(onOpen: (String) -> Unit) {
     val pending = purchases.sumOf { it.pending }
     val overdue = purchases.count { !it.isPaid && it.purchase.dueDate < today }
     val storeName = app.settings.storeName.ifBlank { "Shop Manager" }
+    val monthStart = remember { Period.of(PeriodType.MONTH, 0, 0).from }
+    val month by remember { repo.observeSummarySince(monthStart) }.collectAsState(initial = DaySummary(0, 0.0, 0.0, 0.0))
 
     AppScaffold(
         title = storeName,
@@ -97,6 +102,14 @@ fun HomeScreen(onOpen: (String) -> Unit) {
                 line2 = if (overdue > 0) "$overdue bills overdue" else "No overdue bills",
                 line2Color = if (overdue > 0) Danger else null,
                 onClick = { onOpen(Routes.PURCHASES) }
+            )
+            Tile(
+                title = "Reports",
+                icon = Icons.Default.Assessment,
+                color = Color(0xFF2E5E3A),
+                line1 = "This month: ${month.total.money()}  (${month.count} bills)",
+                line2 = "Sales, stock & supplier statements – PDF / Excel",
+                onClick = { onOpen(Routes.REPORTS) }
             )
         }
     }

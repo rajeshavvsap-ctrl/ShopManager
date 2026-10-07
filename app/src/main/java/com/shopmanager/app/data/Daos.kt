@@ -39,6 +39,9 @@ interface ItemDao {
 
     @Query("SELECT COUNT(*) FROM items")
     fun observeCount(): Flow<Int>
+
+    @Query("SELECT * FROM items ORDER BY category, name COLLATE NOCASE")
+    suspend fun getAll(): List<Item>
 }
 
 @Dao
@@ -64,6 +67,22 @@ interface SaleDao {
            FROM sales WHERE createdAt >= :from"""
     )
     fun observeSummary(from: Long): Flow<DaySummary>
+
+    // ---------- Reports (from inclusive, to exclusive) ----------
+
+    @Query(
+        """SELECT s.*, IFNULL((SELECT SUM(l.quantity) FROM sale_lines l WHERE l.saleId = s.id), 0) AS qty
+           FROM sales s WHERE s.createdAt >= :from AND s.createdAt < :to ORDER BY s.createdAt"""
+    )
+    suspend fun salesBetween(from: Long, to: Long): List<SaleWithQty>
+
+    @Query(
+        """SELECT l.name AS name, SUM(l.quantity) AS qty, SUM(l.quantity * l.unitPrice) AS amount
+           FROM sale_lines l JOIN sales s ON s.id = l.saleId
+           WHERE s.createdAt >= :from AND s.createdAt < :to
+           GROUP BY l.itemId, l.name ORDER BY qty DESC, amount DESC"""
+    )
+    suspend fun itemSalesBetween(from: Long, to: Long): List<ItemSales>
 }
 
 @Dao
@@ -82,6 +101,15 @@ interface PurchaseDao {
            FROM purchases p ORDER BY p.dueDate"""
     )
     fun observeWithPaid(): Flow<List<PurchaseWithPaid>>
+
+    @Query(
+        """SELECT p.*, IFNULL((SELECT SUM(pp.amount) FROM purchase_payments pp WHERE pp.purchaseId = p.id), 0) AS paid
+           FROM purchases p ORDER BY p.dueDate"""
+    )
+    suspend fun getAllWithPaid(): List<PurchaseWithPaid>
+
+    @Query("SELECT * FROM purchase_payments WHERE paidOn >= :from AND paidOn < :to ORDER BY paidOn")
+    suspend fun paymentsBetween(from: Long, to: Long): List<PurchasePayment>
 
     @Query("SELECT IFNULL(SUM(amount), 0) FROM purchase_payments WHERE purchaseId = :purchaseId")
     suspend fun paidFor(purchaseId: Long): Double

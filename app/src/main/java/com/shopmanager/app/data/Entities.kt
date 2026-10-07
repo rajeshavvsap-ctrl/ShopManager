@@ -130,3 +130,16 @@ data class SaleRequestLine(
     val quantity: Int,
     val unitPrice: Double
 )
+
+/** Item-wise quantity and amount sold in a period. */
+data class ItemSales(
+    val name: String,
+    val qty: Int,
+    val amount: Double
+)
+
+/** A bill with the total number of pieces in it. */
+data class SaleWithQty(
+    @Embedded val sale: Sale,
+    val qty: Int
+)

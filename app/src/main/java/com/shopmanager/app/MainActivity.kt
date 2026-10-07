@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.shopmanager.app.ui.home.HomeScreen
 import com.shopmanager.app.ui.purchase.AddPurchaseScreen
+import com.shopmanager.app.ui.reports.ReportsScreen
 import com.shopmanager.app.ui.purchase.PurchaseScreen
 import com.shopmanager.app.ui.sales.SalesHistoryScreen
 import com.shopmanager.app.ui.sales.SalesScreen
@@ -26,6 +27,7 @@ object Routes {
     const val PURCHASES = "purchases"
     const val PURCHASE_ADD = "purchase_add"
     const val SETTINGS = "settings"
+    const val REPORTS = "reports"
 }
 
 class MainActivity : ComponentActivity() {
@@ -51,6 +53,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Routes.PURCHASE_ADD) { AddPurchaseScreen(onBack = back) }
                     composable(Routes.SETTINGS) { SettingsScreen(onBack = back) }
+                    composable(Routes.REPORTS) { ReportsScreen(onBack = back) }
                 }
             }
         }

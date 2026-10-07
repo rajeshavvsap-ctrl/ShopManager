@@ -124,6 +124,7 @@ class ShopRepository(private val db: AppDatabase) {
 
     fun observeRecentSales(limit: Int = 200) = saleDao.observeRecent(limit)
     fun observeTodaySummary() = saleDao.observeSummary(startOfDay(System.currentTimeMillis()))
+    fun observeSummarySince(from: Long) = saleDao.observeSummary(from)
     suspend fun saleLines(saleId: Long) = saleDao.linesFor(saleId)
 
     /** Saves the bill and reduces stock in one transaction. Nothing is saved if any item is short. */
@@ -201,6 +202,15 @@ class ShopRepository(private val db: AppDatabase) {
         }
 
     suspend fun deletePurchase(purchase: Purchase) = purchaseDao.delete(purchase)
+
+    // ---------------- Reports ----------------
+
+    suspend fun salesBetween(from: Long, to: Long) = saleDao.salesBetween(from, to)
+    suspend fun itemSalesBetween(from: Long, to: Long) = saleDao.itemSalesBetween(from, to)
+    suspend fun allItems() = itemDao.getAll()
+    suspend fun allPurchasesWithPaid() = purchaseDao.getAllWithPaid()
+    suspend fun supplierPaymentsBetween(from: Long, to: Long) = purchaseDao.paymentsBetween(from, to)
+    suspend fun purchaseById(id: Long) = purchaseDao.getById(id)
 
     companion object {
         const val LOW_STOCK = 2
